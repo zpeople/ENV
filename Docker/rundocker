@@ -1,0 +1,24 @@
+# 打开功能
+Turn Windows features on or off
+
+dism.exe /online /enable-feature /featurename:Microsoft-Hyper-V /all /norestart
+dism.exe /online /enable-feature /featurename:Containers /all /norestart
+dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+bcdedit /set hypervisorlaunchtype Auto
+
+# 构建Docker镜像 dcoakerfile没有后缀
+docker build -t cgan .
+
+# 运行Docker容器 flask
+docker run -d -p 5000:5000 cgan
+
+# 运行Docker容器 jupyter
+docker run -it --rm -p 8888:8888 cgan
+
+# 查看运行的docker
+docker ps
+
+# 停止docker
+docker stop xxxxxx
+
