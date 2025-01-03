@@ -1,0 +1,6 @@
+setx JAVA_HOME "C:\ENV\Java"
+
+setx PATH "%PATH%;%JAVA_HOME%\bin"
+
+
+
