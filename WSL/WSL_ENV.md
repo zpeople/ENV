@@ -3,6 +3,9 @@
 wsl --list --online # 查询可在线安装的发行版本
 wsl --install -d <Distribution Name> # 安装对应的发行版本
 wsl --set-default-version 2
+
+#删除系统
+wsl --unregister <DistributionName>
 ```
 
 
@@ -17,20 +20,31 @@ sudo chmod 777 Miniconda3-latest-Linux-x86_64.sh
 ```
 ### conda create env
 ```
-conda create -n env_name python=3.11
+conda create -n env_python python=3.10
 conda env list #查看当前环境列表
-conda activate env_name #进入该虚拟环境
+conda activate env_python #进入该虚拟环境
 conda deactivate #退出当前虚拟环境
-conda env remove --name env_name #删除指定虚拟环境
+conda env remove --name env_python #删除指定虚拟环境
 conda config --set env_prompt '({default_env})' #将虚拟环境名恢复默认
 ```
 ### 查看显卡和cuda版本
 ```
 nvidia-smi
+sudo nvidia-smi
 
 在命令行输入nvidia-smi查看系统可安装的最新的cuda版本。
 
 你可以安装所有不高于这个版本的cuda，一般情况下安装此版本即可
+
+针对WSL的
+https://docs.nvidia.com/cuda/wsl-user-guide/index.html
+
+#修复Linux中无效问题
+sudo cp /usr/lib/wsl/lib/nvidia-smi /usr/bin/nvidia-smi
+sudo chmod ogu+x /usr/bin/nvidia-smi
+在wsl2中运行这两个语句，再输入nvidia-smi，成功了
+
+
 ```
 ### 安装 CUDA 之前，子系统需要准备编译相关所需的环境
 ```
@@ -40,13 +54,14 @@ sudo apt install build-essential # 安装编译所需的工具链
 ```
 ### 安装CUDA
 ```
+
 https://developer.nvidia.com/cuda-toolkit-archive
 
 进入网页，选择对应的平台，示例代码
 
 wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
 sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
-wget https://developer.download.nvidia.com/compute/cuda/12.4.0/local_installers/cuda-repo-wsl-ubuntu-12-4-local_12.4.0-1_amd64.deb
+sudo wget https://developer.download.nvidia.com/compute/cuda/12.4.0/local_installers/cuda-repo-wsl-ubuntu-12-4-local_12.4.0-1_amd64.deb
 sudo dpkg -i cuda-repo-wsl-ubuntu-12-4-local_12.4.0-1_amd64.deb
 sudo cp /var/cuda-repo-wsl-ubuntu-12-4-local/cuda-*-keyring.gpg /usr/share/keyrings/
 sudo apt-get update
@@ -62,7 +77,11 @@ sudo apt-get remove --autoremove cuda
 sudo apt-get purge cuda-*
 
 #不行就强制删除
+sudo apt-get remove --purge '^cuda-.*'
 sudo rm -rf /usr/local/cuda
+
+#验证包是否正确安装
+dpkg -l | grep cuda
 ```
 ### 启动配置PATH
 ```
@@ -71,7 +90,7 @@ nano ~/.bashrc
 source ~/.bashrc
 
 # miniconda3 对应的路径
-export PATH=/home/zpeople/miniconda3/bin:$PATH
+export PATH=/home/zzz/miniconda3/bin:$PATH
 
 # Add nvcc compiler to PATH
 export PATH=/usr/local/cuda/bin:$PATH
@@ -114,6 +133,11 @@ conda install pytorch torchvision torchaudio pytorch-cuda=12.4 -c pytorch -c nvi
 
 之前的版本 
 https://pytorch.org/get-started/previous-versions/
+```
+### 安装ML库
+```
+conda install jupyter numpy pandas tensorboard matplotlib tqdm pyyaml -y
+
 ```
 ### 安装Tensorflow
 ```

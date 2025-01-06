@@ -38,7 +38,7 @@ wsl --set-default-version 2
 
 ```bash
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y build-essential git curl wget htop vim
+sudo apt install -y build-essential git curl wget htop 
 ```
 
 ### 4. 安装 OpenSSH Server
@@ -164,15 +164,18 @@ VS Code 提供了强大的远程开发功能，可以方便地通过 SSH 连接�
    ```bash
    ssh username@172.29.160.1
    ```
+4. **删除文件**：
+   ```bash
+   .ssh\known_hosts
+   ```
 
-。
 
 
 
 
 是的，SSH（Secure Shell）可以配置多个用户来远程访问 Linux 系统，包括在 WSL 中。通过 SSH，你可以为不同的用户提供独立的账户和权限，从而实现多用户的远程访问和管理。以下是详细的步骤和配置方法：
 
-### 1. 创建多个用户
+### 10. 创建多个用户
 
 首先，你需要在 WSL 中创建多个用户账户。
 
@@ -249,172 +252,5 @@ ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 
 重复上述步骤为其他用户配置 SSH 密钥。
 
-### 3. 启动和配置 SSH 服务
 
-确保 SSH 服务在 WSL 中正确启动和配置。
 
-#### a. 安装 OpenSSH Server
-
-如果尚未安装，可以按照以下步骤安装：
-
-```bash
-sudo apt update
-sudo apt install -y openssh-server
-```
-
-#### b. 启动 SSH 服务
-
-```bash
-sudo service ssh start
-```
-
-#### c. 检查 SSH 服务状态
-
-```bash
-sudo systemctl status ssh
-```
-
-确保服务正在运行并且没有错误。
-
-#### d. 配置防火墙
-
-确保 Windows 防火墙允许 SSH 流量。你可以手动配置防火墙规则或使用以下 PowerShell 命令：
-
-```powershell
-New-NetFirewallRule -DisplayName 'Open Port 22 for WSL' -Direction Inbound -LocalPort 22 -Protocol TCP -Action Allow
-```
-
-### 4. 查找 WSL IP 地址
-
-WSL 使用一个动态分配的 IP 地址。你可以通过以下命令查找 WSL 的 IP 地址：
-
-```bash
-ip addr show eth0 | grep 'inet\b' | awk '{print $2}' | cut -d/ -f1
-```
-
-记下输出的 IP 地址，例如 `172.29.160.1`。
-
-### 5. 通过 SSH 连接到 WSL
-
-现在，你可以使用 SSH 从本地机器连接到 WSL 中的不同用户。
-
-#### a. 连接到 `alice` 用户
-
-```bash
-ssh alice@172.29.160.1
-```
-
-系统会提示你输入私钥的密码（如果你设置了的话）。成功连接后，你会看到 `alice` 用户的 shell 提示符。
-
-#### b. 连接到其他用户
-
-同样地，你可以连接到其他用户，只需替换用户名即可：
-
-```bash
-ssh bob@172.29.160.1
-```
-
-### 6. 配置自动启动 SSH 服务（可选）
-
-为了让 SSH 服务在 WSL 启动时自动启动，可以创建一个 systemd 服务单元文件。
-
-#### a. 创建 systemd 服务单元文件
-
-```bash
-sudo nano /etc/systemd/system/sshd.service
-```
-
-#### b. 添加以下内容
-
-```ini
-[Unit]
-Description=OpenBSD Secure Shell server
-After=network.target
-
-[Service]
-ExecStart=/usr/sbin/sshd -D
-Restart=always
-User=root
-
-[Install]
-WantedBy=multi-user.target
-```
-
-#### c. 启用并启动服务
-
-```bash
-sudo systemctl enable sshd
-sudo systemctl start sshd
-```
-
-### 7. 使用 VS Code 远程开发（可选）
-
-VS Code 提供了强大的远程开发功能，可以方便地通过 SSH 连接到 WSL 并进行开发。
-
-#### a. 安装 VS Code
-
-- 访问 [VS Code 官方网站](https://code.visualstudio.com/) 并下载安装。
-
-#### b. 安装 Remote - SSH 扩展
-
-- 打开 VS Code。
-- 进入扩展市场，搜索 "Remote - SSH" 并安装。
-
-#### c. 连接到 WSL
-
-- 打开 VS Code 命令面板（Ctrl+Shift+P 或 Cmd+Shift+P）。
-- 输入 "Remote-SSH: Connect to Host..." 并选择你的 WSL IP 地址或主机名。
-
-### 示例：配置多个用户并通过 SSH 连接
-
-假设你想为 `alice` 和 `bob` 两个用户配置 SSH 访问，并且 WSL 的 IP 地址是 `172.29.160.1`，以下是具体步骤：
-
-1. **创建用户**：
-   ```bash
-   sudo adduser alice
-   sudo adduser bob
-   ```
-
-2. **生成 SSH 密钥对**（如果还没有的话）：
-   ```bash
-   ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-   ```
-
-3. **将公钥复制到 `alice` 用户**：
-   ```bash
-   sudo su - alice
-   mkdir -p ~/.ssh
-   chmod 700 ~/.ssh
-   nano ~/.ssh/authorized_keys
-   ```
-   粘贴公钥内容并保存。
-
-4. **将公钥复制到 `bob` 用户**：
-   ```bash
-   sudo su - bob
-   mkdir -p ~/.ssh
-   chmod 700 ~/.ssh
-   nano ~/.ssh/authorized_keys
-   ```
-   粘贴公钥内容并保存。
-
-5. **启动 SSH 服务**：
-   ```bash
-   sudo service ssh start
-   ```
-
-6. **查找 WSL IP 地址**：
-   ```bash
-   ip addr show eth0 | grep 'inet\b' | awk '{print $2}' | cut -d/ -f1
-   ```
-   输出可能是 `172.29.160.1`。
-
-7. **通过 SSH 连接到 `alice` 用户**：
-   ```bash
-   ssh alice@172.29.160.1
-   ```
-
-8. **通过 SSH 连接到 `bob` 用户**：
-   ```bash
-   ssh bob@172.29.160.1
-   ```
