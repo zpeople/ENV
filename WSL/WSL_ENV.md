@@ -188,4 +188,15 @@ netsh interface portproxy show all
 地址            端口        地址            端口
 --------------- ----------  --------------- ----------
 0.0.0.0         23          localhost       23
+
+```
+
+### proxy
+```
+clash 直接开启TUN
+cat /etc/resolv.conf
+
+export http_proxy="172.31.192.1:7890"
+export https_proxy="172.31.192.1:7890"
+
 ```
