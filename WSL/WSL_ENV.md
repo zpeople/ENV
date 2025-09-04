@@ -1,3 +1,4 @@
+## WSL
 ### WSL 安装
 ```
 wsl --list --online # 查询可在线安装的发行版本
@@ -7,9 +8,56 @@ wsl --set-default-version 2
 #删除系统
 wsl --unregister <DistributionName>
 ```
+### 导出wsl
+ ```
+ wsl -l -v
+这个命令用来列出所有已安装的 WSL Linux 发行版，并显示它们的版本和状态（是否正在运行）。-v 选项表示详细模式。
+wsl --shutdown
+该命令会关闭所有的 WSL 后台进程，相当于关闭所有 WSL Linux 系统。这可以释放系统资源并确保在导出发行版时文件不会被占用。
+wsl --export Ubuntu D:\Ubuntu_WSL\Ubuntu.tar
+这个命令将名为 "Ubuntu" 的 WSL 发行版导出为一个 tar 文件，保存路径为 D:\Ubuntu_WSL\Ubuntu.tar。这会创建一个该发行版的备份，包括所有安装的软件包和个人配置。
+wsl --unregister Ubuntu
+该命令会从 WSL 中注销 "Ubuntu" 发行版。这意味着它将从 WSL 注册表中删除，但不会删除实际的文件。如果你之前已经用 --export 命令备份了数据，那么这些数据仍然存在于备份文件中。
+wsl --import Ubuntu D:\Ubuntu_WSL D:\Ubuntu_WSL\Ubuntu.tar
+该命令将之前导出的 "Ubuntu" 发行版重新导入到 WSL。D:\Ubuntu_WSL 是新发行版的安装目录，而 D:\Ubuntu_WSL\Ubuntu.tar 是之前导出的 tar 文件的位置。这允许你在不同的机器上恢复 WSL 发行版或在同一机器上重新安装。
+Ubuntu config --default-user wr
+这个命令设置 "Ubuntu" 发行版的默认用户为 wr。当启动 WSL 或通过命令行启动 Ubuntu 时，它将自动以这个用户身份登录，而不必每次都手动输入用户名和密码。
+ ```
+### VSCode 配置
+```
+在代码工作目录下执行 code . 会自动安装 VSCode 服务以当前目录为工作区启动
+```
+### netsh 命令配置 Windows 的端口转发
+* wsl2可以和windows本机共享一个ip, 而wsl2默认的ssh 端口为23, 也就是说其ssh-host为${you-windows-ip}:23, (这里要注意的是, wsl2上的端口要避免和windows上产生冲突);
+* 虽然是共享ip,但是外界并不能直接访问wsl2, 需要配置端口映射才能访问;
+* 需要在防火墙开发端口的访问权限;
+
+```
+# option prot proxy
+netsh interface portproxy add v4tov4 listenport=23 listenaddress=0.0.0.0 connectport=23 connectaddress=localhost
+# show port proxy
+netsh interface portproxy show all
 
 
+侦听 ipv4:                 连接到 ipv4:
 
+地址            端口        地址            端口
+--------------- ----------  --------------- ----------
+0.0.0.0         23          localhost       23
+
+```
+
+### proxy
+```
+clash 直接开启TUN
+cat /etc/resolv.conf
+
+export http_proxy="172.31.192.1:7890"
+export https_proxy="172.31.192.1:7890"
+
+```
+
+## Conda
 ### download miniconda
 ```
 
@@ -46,6 +94,18 @@ pip config set global.extra-index-url https://mirrors.aliyun.com/pypi/simple/
 中科大：https://pypi.mirrors.ustc.edu.cn/simple/
 豆瓣：https://pypi.doubanio.com/simple/
 ```
+
+### python config
+```
+Python 环境
+在 ~/.pip/pip.conf 文件中写入如下内容
+
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple
+trusted-host = http://pypi.tuna.tsinghua.edu.cn
+```
+
+## Cuda
 ### 查看显卡和cuda版本
 ```
 nvidia-smi
@@ -162,60 +222,45 @@ conda install jupyter numpy pandas tensorboard matplotlib tqdm pyyaml -y
 ```
 https://www.tensorflow.org/install/source?hl=zh-cn#gpu
 ```
-### 导出wsl
- ```
- wsl -l -v
-这个命令用来列出所有已安装的 WSL Linux 发行版，并显示它们的版本和状态（是否正在运行）。-v 选项表示详细模式。
-wsl --shutdown
-该命令会关闭所有的 WSL 后台进程，相当于关闭所有 WSL Linux 系统。这可以释放系统资源并确保在导出发行版时文件不会被占用。
-wsl --export Ubuntu D:\Ubuntu_WSL\Ubuntu.tar
-这个命令将名为 "Ubuntu" 的 WSL 发行版导出为一个 tar 文件，保存路径为 D:\Ubuntu_WSL\Ubuntu.tar。这会创建一个该发行版的备份，包括所有安装的软件包和个人配置。
-wsl --unregister Ubuntu
-该命令会从 WSL 中注销 "Ubuntu" 发行版。这意味着它将从 WSL 注册表中删除，但不会删除实际的文件。如果你之前已经用 --export 命令备份了数据，那么这些数据仍然存在于备份文件中。
-wsl --import Ubuntu D:\Ubuntu_WSL D:\Ubuntu_WSL\Ubuntu.tar
-该命令将之前导出的 "Ubuntu" 发行版重新导入到 WSL。D:\Ubuntu_WSL 是新发行版的安装目录，而 D:\Ubuntu_WSL\Ubuntu.tar 是之前导出的 tar 文件的位置。这允许你在不同的机器上恢复 WSL 发行版或在同一机器上重新安装。
-Ubuntu config --default-user wr
-这个命令设置 "Ubuntu" 发行版的默认用户为 wr。当启动 WSL 或通过命令行启动 Ubuntu 时，它将自动以这个用户身份登录，而不必每次都手动输入用户名和密码。
- ```
-### python config
-```
-Python 环境
-在 ~/.pip/pip.conf 文件中写入如下内容
 
-[global]
-index-url = https://pypi.tuna.tsinghua.edu.cn/simple
-trusted-host = http://pypi.tuna.tsinghua.edu.cn
+
+## Docker
+### 卸载 docker
 ```
-### VSCode 配置
+sudo apt-get remove docker docker-engine docker.io containerd runc
 ```
-在代码工作目录下执行 code . 会自动安装 VSCode 服务以当前目录为工作区启动
+### 安装 docker
 ```
-### netsh 命令配置 Windows 的端口转发
-* wsl2可以和windows本机共享一个ip, 而wsl2默认的ssh 端口为23, 也就是说其ssh-host为${you-windows-ip}:23, (这里要注意的是, wsl2上的端口要避免和windows上产生冲突);
-* 虽然是共享ip,但是外界并不能直接访问wsl2, 需要配置端口映射才能访问;
-* 需要在防火墙开发端口的访问权限;
+依赖包
+sudo apt-get install -y ca-certificates curl gnupg lsb-release
+
+获取官方GPG密钥
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+
+设置稳定版
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+安装docker
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
+```
+### 配置用户组
 
 ```
-# option prot proxy
-netsh interface portproxy add v4tov4 listenport=23 listenaddress=0.0.0.0 connectport=23 connectaddress=localhost
-# show port proxy
-netsh interface portproxy show all
+# 创建 docker 用户组（如已存在则忽略）
+sudo groupadd docker
 
+# 将当前用户添加到 docker 组
+sudo usermod -aG docker $USER
 
-侦听 ipv4:                 连接到 ipv4:
-
-地址            端口        地址            端口
---------------- ----------  --------------- ----------
-0.0.0.0         23          localhost       23
-
+# 注销并重新登录 WSL 使配置生效
 ```
-
-### proxy
+### 验证docker
 ```
-clash 直接开启TUN
-cat /etc/resolv.conf
-
-export http_proxy="172.31.192.1:7890"
-export https_proxy="172.31.192.1:7890"
-
+# 检查 Docker 版本
+docker --version
+# 手动启动一下
+sudo service docker start
+# 运行 hello-world 容器验证
+docker run hello-world
 ```
