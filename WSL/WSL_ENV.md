@@ -20,12 +20,31 @@ sudo chmod 777 Miniconda3-latest-Linux-x86_64.sh
 ```
 ### conda create env
 ```
-conda create -n env_python python=3.10
+conda create -n env_python python=3.10 -c  https://mirrors.tuna.tsinghua.edu.cn/anaconda/pkgs/main/
+
+https://mirrors.ustc.edu.cn/anaconda/pkgs/main/
+https://mirrors.aliyun.com/anaconda/pkgs/main/
+
 conda env list #查看当前环境列表
 conda activate env_python #进入该虚拟环境
 conda deactivate #退出当前虚拟环境
 conda env remove --name env_python #删除指定虚拟环境
 conda config --set env_prompt '({default_env})' #将虚拟环境名恢复默认
+```
+### pip
+```
+pip install ipykernel -i https://pypi.mirrors.ustc.edu.cn/simple/
+
+# 设置清华源为默认
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple/
+
+# 如需添加备用源
+pip config set global.extra-index-url https://mirrors.aliyun.com/pypi/simple/
+
+清华：https://pypi.tuna.tsinghua.edu.cn/simple/
+阿里云：https://mirrors.aliyun.com/pypi/simple/
+中科大：https://pypi.mirrors.ustc.edu.cn/simple/
+豆瓣：https://pypi.doubanio.com/simple/
 ```
 ### 查看显卡和cuda版本
 ```
