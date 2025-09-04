@@ -231,17 +231,18 @@ sudo apt-get remove docker docker-engine docker.io containerd runc
 ```
 ### 安装 docker
 ```
-依赖包
+# 依赖包
 sudo apt-get install -y ca-certificates curl gnupg lsb-release
 
-获取官方GPG密钥
+# 获取官方GPG密钥
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
 
-设置稳定版
+# 设置稳定版
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-安装docker
-sudo apt-get update
+# 安装docker
+# 必须先update，才能安装软件
+sudo apt-get update 
 sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 ```
 ### 配置用户组
@@ -263,4 +264,70 @@ docker --version
 sudo service docker start
 # 运行 hello-world 容器验证
 docker run hello-world
+# 检查GPU
+docker run --rm --gpus all nvidia/cuda:12.4.0-base-ubuntu22.04 nvidia-smi
+```
+
+### WSL的docker查看IP
+```
+hostname -I
+
+# 输出的两个IP 
+# 172.23.207.112	WSL 分发的主 IP 地址，用于与 Windows 主机或其他网络通信。
+# 172.17.0.1	Docker 默认桥接网络的网关地址（如果你在 WSL 中安装并运行了 Docker）
+
+```
+### docker的GPU
+```
+# 添加 NVIDIA 的包源
+distribution=$(. /etc/os-release;echo $ID$VERSION_ID)
+curl -s -L https://nvidia.github.io/nvidia-docker/gpgkey | sudo apt-key add -
+curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.list | \
+  sudo tee /etc/apt/sources.list.d/nvidia-docker.list
+sudo apt-get update
+sudo apt-get install -y nvidia-container-toolkit
+
+
+# 重启
+sudo systemctl restart docker
+```
+### 强制移除所有容器
+```
+docker rm -f $(docker ps -aq)
+
+```
+### 报错 error getting credentials
+```
+docker: error getting credentials - err: exec: "docker-credential-desktop.exe": executable file not found in $PATH, out: 
+#禁用凭证
+export DOCKER_CONFIG=/tmp/docker-empty-config
+mkdir -p /tmp/docker-empty-config
+echo '{}' > /tmp/docker-empty-config/config.json
+
+```
+### 报错 Error 500: named symbol not found
+```
+#修改源
+curl -fsSL https://mirrors.ustc.edu.cn/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+&& curl -s -L https://mirrors.ustc.edu.cn/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+sed 's#deb https://nvidia.github.io#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://mirrors.ustc.edu.cn#g' | \
+sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+# 安装
+apt-get update
+
+sudo apt-get install -y nvidia-container-toolkit
+
+#验证
+nvidia-container-cli  --version
+
+#配置docker
+ sudo nvidia-ctk runtime configure --runtime=docker
+
+#重启docker
+systemctl restart docker
+
+$查看docker运行有没有 nvidia 输出 Runtimes: nvidia runc io.containerd.runc.v2
+docker info | grep Runtimes
+
 ```
