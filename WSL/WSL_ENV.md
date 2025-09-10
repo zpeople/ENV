@@ -103,6 +103,8 @@ Python 环境
 [global]
 index-url = https://pypi.tuna.tsinghua.edu.cn/simple
 trusted-host = http://pypi.tuna.tsinghua.edu.cn
+
+python:select interpreter
 ```
 
 ## Cuda

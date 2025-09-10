@@ -54,9 +54,21 @@ sudo apt install -y build-essential git curl wget htop
    ```bash
    sudo service ssh start
    ```
+   
+   ```
+   sudo nano /etc/wsl.conf
+  
+   #粘贴内容
+   [boot]
+   systemd=true  # 关键：启用 systemd
+
+   [user]
+   default=你的用户名  # 替换为你的 WSL 用户名（如 ubuntu）
+   ```
 
 3. **检查 SSH 服务状态**：
    ```bash
+   
    sudo systemctl status ssh
    ```
    确保服务正在运行并且没有错误。

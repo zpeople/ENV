@@ -37,3 +37,13 @@
    如果成功，会显示你的 GitHub 用户名
 
 再次尝试 `git pull --tags origin main` 应该就能正常工作了。
+```
+nano ~/.ssh/config
+
+Host github.com
+  HostName ssh.github.com  # GitHub 443端口专用地址
+  User git
+  IdentityFile ~/.ssh/id_rsa
+  Port 443  # 改用443端口（通常不被封锁）
+
+```
